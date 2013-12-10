@@ -18,10 +18,16 @@ API Library for BTC-E
 
 ## Configuring API Credentials
 
+In REPL:
+
     user=> (configure :api-key "blah" :api-secret "blah")
     {:api-key "blah", :api-secret "blah"}
     user=> @credentials
     {:api-key "blah", :api-secret "blah"}
+
+In code:
+
+    (btce/configure :api-key "blah" :api-secret "blah")
 
 ## Usage
 
