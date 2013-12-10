@@ -24,9 +24,6 @@
 (def credentials (atom {:api-key nil :api-secret nil}))
 
 (def api-url "https://btc-e.com/tapi")
-; Utility Functions
-
-; http://stackoverflow.com/questions/3937661/remove-nil-values-from-a-map
 
 (defn sign-params [params]
   (sha512-hmac 

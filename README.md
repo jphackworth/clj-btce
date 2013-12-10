@@ -50,15 +50,15 @@ In code:
 See [BTC-E Trading API](https://btc-e.com/api/documentation) for official API documentation.
 
 - (get-info)
-- (get-transaction-history :from <from> :limit <count> :from_id <from_id> :end_id <end_id> :since <since> :end <end>)
-- (get-trade-history :from <from> :limit <count> :from_id <from_id> :end_id <end_id> :since <since> :end <end> :pair <pair>)
-- (get-active-orders <currency pair>)
+- (get-transaction-history :from from :limit count :from_id from_id :end_id end_id :since since :end end)
+- (get-trade-history :from <from> :limit count :from_id from_id :end_id end_id :since since :end end :pair pair)
+- (get-active-orders "btc_usd")
 - (create-trade [currency1 currency2 type rate amount])
 - (cancel-order [orderid])
 
 #### Trading API Examples
 
-    (get-info)
+    (get-info) ; balance information
     (get-transaction-history) ; keyword arguments are optional
     (get-trade-history) ; keyword arguments are optional
     (get-trade-history :limit 20)
