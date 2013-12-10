@@ -1,4 +1,4 @@
-(defproject clj-btce "0.0.1-SNAPSHOT"
+(defproject clj-btce "0.0.2"
   :description "API support for BTC-E"
   :author {:email "jph@hackworth.be" :web "https://hackworth.be"}
   :url "https://github.com/jphackworth/clj-btce"
@@ -14,7 +14,4 @@
   [org.clojure/data.csv "0.1.2"]
   [jarohen/chime "0.1.2"]
   [pandect "0.3.0"]
-   [org.clojure/tools.namespace "0.2.4"]]
-  :main ^:skip-aot clj-btce.core
-  :target-path "target/%s"
-  :profiles {:uberjar {:aot :all}})
+   [org.clojure/tools.namespace "0.2.4"]])
