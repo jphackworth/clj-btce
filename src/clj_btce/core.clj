@@ -110,7 +110,6 @@
 (defn cancel-order [orderid]
   (post-data {"method" "CancelOrder" "order_id" orderid "nonce" (nonce)}))
 
-
 ; Public API - https://btc-e.com/page/2
 
 (defn get-fee [currency1 currency2]

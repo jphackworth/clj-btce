@@ -46,7 +46,7 @@ In REPL:
     user=> (configure :api-key "blah" :api-secret "blah")
     {:api-key "blah", :api-secret "blah"}
     user=> @config
-    {:api-key "blah", :api-secret "blah" :insecure false, :public-api-url "https://btc-e.com/api/2", :user-agent "clj-btce 0.1.0", :keepalive 30000, :trade-api-url "https://btc-e.com/tapi"}
+    {:api-key "blah", :api-secret "blah" :insecure false, :public-api-url "https://btc-e.com/api/2", :user-agent "clj-btce 0.1.0", :keepalive 30000, :trade-api-url "https://btc-e.com/tapi" :nonce-ms 500}
 
 In code:
 
