@@ -1,4 +1,4 @@
-; Copyright (C) 2013 John. P Hackworth <jph@hackworth.be>
+; Copyright (C) 2014 John. P Hackworth <jph@hackworth.be>
 ;
 ; This Source Code Form is subject to the terms of the Mozilla Public
 ; License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -6,30 +6,26 @@
 
 (ns clj-btce.core
   (:require [org.httpkit.client :as http]
-    [clojure.data.json :as json]
-    [clj-time.format :as tf]  
-    [clj-time.core :as t]
-    [clj-time.local :as tl]
-    [clj-time.coerce :as coerce]
-    [clj-time.periodic :refer [periodic-seq]]
-    [clojure.data.csv :as csv]
-    [clojure.java.io :as io])
-  (:use 
-    [clojure.string :only [upper-case lower-case join]]
-    [pandect.core]
-    [clojure.tools.namespace.repl :only (refresh)]
+    [cheshire.core :refer :all]
+    [clojure.string :refer [upper-case lower-case join]]
+    [pandect.core :refer [sha512-hmac]]))
 
-    ))
-
-(def credentials (atom {:api-key nil :api-secret nil}))
-
-(def api-url "https://btc-e.com/tapi")
+(def config (atom {:api-key nil 
+                   :api-secret nil 
+                   :user-agent "clj-btce 0.1.0"
+                   :trade-api-url "https://btc-e.com/tapi"
+                   :public-api-url "https://btc-e.com/api/2"
+                   :keepalive 30000
+                   :insecure false
+                   :nonce-ms 500}))
 
 (defn sign-params [params]
-  (sha512-hmac 
+  (if (nil? (:api-secret @config))
+    (throw (Exception. "api-secret not assigned"))
+     (sha512-hmac 
     (join "&" 
       (for [[k v] (into {} (filter second params))] 
-        (format "%s=%s" k v))) (@credentials :api-secret)))
+        (format "%s=%s" k v))) (@config :api-secret))))
 
 (defn nonce 
   "The BTC-E API requires each request to include a unique and incremented nonce integer parameter.
@@ -41,7 +37,7 @@
   This function provides an abbreviated time-based nonce. If you need to run parallel requests,
   then you will need to implement your own nonce-management scheme and call post-data directly.
   "
-  [] (quot (System/currentTimeMillis) 500))
+  [] (quot (System/currentTimeMillis) (:nonce-ms @config)))
 
 ; Network/Data Handling Functions
 
@@ -50,16 +46,16 @@
   
   You should not use this directly, as it requires a correctly formatted URL.
   "
-  [url]  
-  (def options {:method :get 
-    :content-type "application/json"
-    :user-agent "clj-btce 0.0.1"
-    :insecure? false 
-    :keepalive 30000})
-  (def response @(http/get url options))
-  (case (response :status)
-    200 (json/read-str (response :body) :key-fn keyword)
-    nil))
+  [url]
+  (let [options {:method :get 
+                 :content-type "application/json"
+                 :user-agent (:user-agent @config)
+                 :insecure? (:insecure @config) 
+                 :keepalive (:keepalive @config)}
+        response @(http/get url options)]
+    (case (:status response)
+      200 (parse-string (response :body) true)
+      (throw (Exception. response)))))
 
 (defn post-data 
   "post-data is used for authenticated, trade api calls.
@@ -68,20 +64,24 @@
   
   You should not use post-data directly, as it requires correctly formatted parameters.
   "
-  [& [params]]
+  [& [p]]
+  (if (nil? (:api-key @config)) (throw (Exception. "api-key not assigned")))
   
-  (let [p (filter second params)]
-    (let [options {:method :post
-      :content-type "application/json"
-      :user-agent "clj-btce 0.0.1"
-      :insecure? false
-      :headers {"Key" (@credentials :api-key) "Sign" (sign-params p) }
-      :form-params p
-      :keepalive 30000}]
-      (let [response @(http/post api-url options)]
-        (case (response :status)
-          200 (json/read-str (response :body) :key-fn keyword)
-          nil)))))
+  (let [params (filter second p) 
+        options {:method :post
+                 :content-type "application/json"
+                 :user-agent (:user-agent @config)
+                 :insecure? (:insecure @config)
+                 :headers {"Key" (:api-key @config) "Sign" (sign-params params) }
+                 :form-params params
+                 :keepalive (:keepalive @config)}
+        response @(http/post (:trade-api-url @config) options)]
+          (case (:status response)
+            200 (let [body (parse-string (response :body) true)] 
+                  (case (:success body)
+                    0 (throw (Exception. (:error body)))
+                    (:return body)))
+            (throw (Exception. response)))))
 
 ; Trading API - https://btc-e.com/api/documentation
 
@@ -114,22 +114,22 @@
 ; Public API - https://btc-e.com/page/2
 
 (defn get-fee [currency1 currency2]
-  (let [url (format "https://btc-e.com/api/2/%s_%s/fee" (name currency1) (name currency2))]
+  (let [url (format "%s/%s_%s/fee" (:public-api-url @config) (name currency1) (name currency2))]
     (fetch-data url)))
 
 (defn get-ticker [currency1 currency2]
-  (let [url (format "https://btc-e.com/api/2/%s_%s/ticker" (name currency1) (name currency2))]
+  (let [url (format "%s/%s_%s/ticker" (:public-api-url @config) (name currency1) (name currency2))]
     (fetch-data url)))
 
 (defn get-trades [currency1 currency2]
-  (let [url (format "https://btc-e.com/api/2/%s_%s/trades" (name currency1) (name currency2))]
+  (let [url (format "%s/%s_%s/trades" (:public-api-url @config) (name currency1) (name currency2))]
     (fetch-data url)))
 
 (defn get-depth [currency1 currency2]
- (let [url (format "https://btc-e.com/api/2/%s_%s/depth" (name currency1) (name currency2))]
+ (let [url (format "%s/%s_%s/depth" (:public-api-url @config) (name currency1) (name currency2))]
   (fetch-data url))) 
 
 (defn configure [& {:keys [api-key api-secret]}]
-  (if-not (nil? api-key) (swap! credentials assoc :api-key api-key))
-  (if-not (nil? api-secret) (swap! credentials assoc :api-secret api-secret)))
+  (if-not (nil? api-key) (swap! config assoc :api-key api-key))
+  (if-not (nil? api-secret) (swap! config assoc :api-secret api-secret)))
 

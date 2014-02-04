@@ -2,6 +2,29 @@
 
 API Library for BTC-E
 
+## Changes from 0.0.2 to 0.1.0
+
+### Libraries
+
+- Removed a lot of libraries that were left in 0.0.2 for testing. Startup should be much faster
+- Using [Cheshire](https://github.com/dakrone/cheshire) for json parsing
+
+### Configuration
+
+- Configuration is now centrally stored in @config map 
+- Credentials configured the same as in 0.0.2
+- New @config keys include :keepalive (in ms), :insecure (allow insecure http request), :trade-api-url, :public-api-url, :user-agent
+
+### Trade api calls 
+
+- Data previously in :return key, now returned at top-level. In other words: (:return (btce/get-info)) in 0.0.2 is now (btce/get-info) in 0.1.x.
+
+### Error handling
+
+- Exceptions are raised if :api-key or :api-secret is not set, and a trade api call is made
+- If HTTP response is not 200, an exception is raised with the unparsed HTTP response 
+- If HTTP response code is 200 and there is an error, an exception will be raised with the parsed response body as a map.
+
 ## Installation
 
 ### In Repl
@@ -10,7 +33,7 @@ API Library for BTC-E
 
 ### As dependency in project.clj
 
-    [clj-btce "0.0.2"]
+    [clj-btce "0.1.0"]
 
 ### Require in namespace
 
@@ -22,8 +45,8 @@ In REPL:
 
     user=> (configure :api-key "blah" :api-secret "blah")
     {:api-key "blah", :api-secret "blah"}
-    user=> @credentials
-    {:api-key "blah", :api-secret "blah"}
+    user=> @config
+    {:api-key "blah", :api-secret "blah" :insecure false, :public-api-url "https://btc-e.com/api/2", :user-agent "clj-btce 0.1.0", :keepalive 30000, :trade-api-url "https://btc-e.com/tapi"}
 
 In code:
 
@@ -82,6 +105,6 @@ You should not use this in production.
 
 ## License
 
-Copyright © 2013 John P. Hackworth <jph@hackworth.be>
+Copyright © 2014 John P. Hackworth <jph@hackworth.be>
 
 Distributed under the Mozilla Public License Version 2.0
