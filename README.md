@@ -2,9 +2,9 @@
 
 API Library for BTC-E
 
-[clj-btce "0.2.0"]
+[clj-btce "0.2.1"]
 
-## Changes from 0.1.0 to 0.2.0
+## Changes from 0.1.0 to 0.2.x
 
 - Major refactoring
 - Functions now return promises instead of blocking for result.
@@ -43,7 +43,7 @@ API Library for BTC-E
 
 ### As dependency in project.clj
 
-    [clj-btce "0.2.0"]
+    [clj-btce "0.2.1"]
 
 ### Require in namespace
 
