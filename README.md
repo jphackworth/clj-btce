@@ -2,6 +2,8 @@
 
 API Library for BTC-E
 
+[clj-btce "0.2.0"]
+
 ## Changes from 0.1.0 to 0.2.0
 
 - Major refactoring

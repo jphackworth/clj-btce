@@ -1,4 +1,4 @@
-(defproject clj-btce "0.2.0-SNAPSHOT"
+(defproject clj-btce "0.2.0"
   :description "API support for BTC-E"
   :author {:email "jph@hackworth.be" :web "https://hackworth.be"}
   :url "https://github.com/jphackworth/clj-btce"
