@@ -8,6 +8,7 @@
   [http-kit "2.1.16"]
   [pandect "0.3.0"]
   [cheshire "5.3.1"]
-  [prismatic/schema "0.2.1"]]
+  [prismatic/schema "0.2.1"]
+  [medley "0.1.5"]]
   :profiles {:dev {:source-paths ["dev"]
                    :dependencies [[org.clojure/tools.namespace "0.2.4"]]}})
