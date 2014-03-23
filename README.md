@@ -12,29 +12,6 @@ API Library for BTC-E
 - Added experimental currency support 
 - Added helper functions (price-range) 
 
-## Changes from 0.0.2 to 0.1.0
-
-### Libraries
-
-- Removed a lot of libraries that were left in 0.0.2 for testing. Startup should be much faster
-- Using [Cheshire](https://github.com/dakrone/cheshire) for json parsing
-
-### Configuration
-
-- Configuration is now centrally stored in @config map 
-- Credentials configured the same as in 0.0.2
-- New @config keys include :keepalive (in ms), :insecure (allow insecure http request), :trade-api-url, :public-api-url, :user-agent
-
-### Trade api calls 
-
-- Data previously in :return key, now returned at top-level. In other words: (:return (btce/get-info)) in 0.0.2 is now (btce/get-info) in 0.1.x.
-
-### Error handling
-
-- Exceptions are raised if :api-key or :api-secret is not set, and a trade api call is made
-- If HTTP response is not 200, an exception is raised with the unparsed HTTP response 
-- If HTTP response code is 200 and there is an error, an exception will be raised with the parsed response body as a map.
-
 ## Installation
 
 ### In Repl
