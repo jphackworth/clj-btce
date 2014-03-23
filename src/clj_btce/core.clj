@@ -11,6 +11,7 @@
             [clj-btce.currencies :refer :all]
             [clj-btce.helpers :refer :all]
             [schema.core :as s]
+            [medley.core :refer [map-keys]]
             [clj-btce.validation :refer :all]
             [pandect.core :refer [sha512-hmac]]))
 
