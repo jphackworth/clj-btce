@@ -6,11 +6,28 @@
             [clojure.repl :refer :all]
             [schema.core :as s]
             [schema.macros :as sm]
-            [cheshire.core :refer :all]
+            [clj-http.client :as client]
+            [clojure.edn :as edn]
             [clojure.pprint :refer :all]
-            [clojure.string :as string]))
+            [clojure.string :as string])
+  (:use criterium.core)
+  (:import [java.io File IOException FileNotFoundException]
+           [java.nio.file Files Path LinkOption]
+           [java.nio.file.attribute PosixFilePermissions PosixFileAttributes]))
 
-(def acct {:api-secret (clojure.string/trim-newline (slurp "/home/user/.btce.secret"))
-                         :api-key (clojure.string/trim-newline (slurp "/home/user/.btce.key"))})
+(defn load-config [& [filename]] 
+  (let [filename (if-not (nil? filename) 
+                   filename
+                   (str (System/getenv "HOME") "/.btce.conf"))]
+      (edn/read-string (slurp filename))))
 
+(def account (load-config))
 
+(def test-buy-order1 {:pair "ltc_btc"
+                      :type "buy"
+                      :rate 0.001
+                      :amount 1})
+(def test-sell-order1 {:pair "ltc_btc"
+                       :type "sell"
+                       :rate 1
+                       :amount 1})
