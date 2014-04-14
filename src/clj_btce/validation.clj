@@ -1,9 +1,13 @@
 (ns clj-btce.validation
   (:require [schema.core :as s]))
 
-(def ValidPairs (s/enum "btc_usd" "btc_rur" "btc_eur" "ltc_btc" "ltc_usd" "ltc_rur" "ltc_eur" 
-                        "nmc_btc" "nmc_usd" "nvc_btc" "nvc_usd" "usd_rur" "eur_usd" "eur_rur"
-                        "trc_btc" "ppc_btc" "ppc_usd" "ftc_btc" "xpm_btc"))
+(def ValidPairs (s/enum "btc_usd" "btc_rur" "btc_eur" "btc_cnh" "btc_gbp" 
+                        "ltc_btc" "ltc_usd" "ltc_rur" "ltc_eur" "ltc_cnh" "ltc_gbp" 
+                        "nmc_btc" "nmc_usd" 
+                        "nvc_btc" "nvc_usd" 
+                        "usd_rur" "eur_usd" "eur_rur" "usd_cnh" "gbp_usd"
+                        "trc_btc" 
+                        "ppc_btc" "ppc_usd" "ftc_btc" "xpm_btc"))
 (def ValidOrderMethods (s/enum "Trade" "CancelTrade"))
 (def AccountValidation {(s/required-key :api-key) s/Str 
                         (s/required-key :api-secret) s/Str})
@@ -12,9 +16,17 @@
                       (s/required-key :type) (s/enum "buy" "sell")
                       (s/required-key :rate) Number 
                       (s/required-key :amount) Number})
-(def HTTPOptionsValidation {(s/optional-key :keepalive) Long
-                            (s/optional-key :user-agent) s/Str 
-                            (s/optional-key :content-type) s/Str})
+
+;{:date 1397482275, :price 452.798, :amount 5, :tid 35428347, :price_currency "USD", :item "BTC", :trade_type "bid"}
+
+(def TradesValidation {(s/required-key :date) Number
+                       (s/required-key :price) Number 
+                       (s/required-key :amount) Number 
+                       (s/required-key :tid) Number 
+                       (s/required-key :price_currency) s/Str 
+                       (s/required-key :item) s/Str 
+                       (s/required-key :trade_type) (s/enum "bid" "ask")})     
+                  
 
 (defrecord History [method from count from_id end_id order since end success return error http-options])
 
@@ -29,5 +41,4 @@
                               (s/optional-key :pair) ValidPairs})
 
 (def HistoryValidation {(s/required-key :account) AccountValidation 
-                         (s/optional-key :history-filter) HistoryFilterValidation 
-                         (s/optional-key :http-options) HTTPOptionsValidation})
+                         (s/optional-key :history-filter) HistoryFilterValidation})

@@ -10,7 +10,10 @@
 
 (ns clj-btce.helpers
  (:require [clj-btce.currencies :refer :all]
-           [medley.core :refer [map-keys]]))
+           [medley.core :refer [map-keys]])
+ (:import [java.io File IOException FileNotFoundException]
+           [java.nio.file Files Path LinkOption]
+           [java.nio.file.attribute PosixFilePermissions PosixFileAttributes]))
 
 (defn price-range 
   "This function is used to create a collection of evenly incremented 
@@ -42,3 +45,29 @@
         (format)
         (Exception.)
         (throw))))
+
+(def no-follow-links
+  (into-array [LinkOption/NOFOLLOW_LINKS]))
+
+(defn permissions [file]
+  (try
+    (-> (.toPath file)
+        (Files/getPosixFilePermissions no-follow-links)
+        PosixFilePermissions/toString)
+    (catch UnsupportedOperationException e
+      "")))
+
+(defn world-readable? [path] 
+  (let [perms (permissions (File. path))]
+    (= \r (->> perms 
+               (take-last 3)
+               (first)))))
+
+(defn world-writeable? [path] 
+  (let [perms (permissions (File. path))]
+    (= \w (->> perms 
+               (take-last 3)
+               (first)))))
+
+(defn insecure-config? [path]
+  (or (world-readable? path) (world-writeable? path)))
